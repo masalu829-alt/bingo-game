@@ -3,195 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>富住通賓果大樂透 - 立體驚喜財神版</title>
+    <title>富住通賓果大樂透 - 標題跑馬燈版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@900&display=swap');
 
         :root {
-            --primary-red: #e60012;
-            --panel-bg: #8b0000;
+            --bg-red: #e60012;
+            --inner-panel: #8d191d;
+            --text-yellow: #fff200;
             --gold-sphere: radial-gradient(circle at 35% 35%, #fff9c4 0%, #ffeb3b 30%, #fbc02d 60%, #e65100 100%);
-            --text-gold: #ffcc00; 
-            --bulb-on: #fff000;
-            --bulb-off: #5a0000;
+            --btn-yellow: linear-gradient(to bottom, #fffde7 0%, #ffeb3b 100%);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background-color: #1a1a1a;
-            margin: 0;
             height: 100vh;
             width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
             font-family: 'Noto Sans TC', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
-        #main-stage {
+        /* 畫布鎖定 1920x1080 */
+        #canvas {
             position: relative;
-            width: 96vw;
-            height: 92vh;
-            background-color: var(--primary-red);
-            border: 20px solid #c00000;
-            outline: 6px solid #ffcc00;
-            border-radius: 15px;
+            width: 1920px;
+            height: 1080px;
+            background-color: var(--bg-red);
             display: flex;
             flex-direction: column;
-            padding: 2vh 2.5vw;
-            box-sizing: border-box;
-            box-shadow: 0 0 60px rgba(0,0,0,1);
-        }
-
-        #marquee-container {
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            pointer-events: none;
-            z-index: 50;
-        }
-
-        .bulb {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: var(--bulb-off);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            border: 1px solid rgba(0,0,0,0.3);
-        }
-
-        @keyframes marquee-flash {
-            0%, 20% { 
-                background-color: var(--bulb-on); 
-                box-shadow: 0 0 15px var(--bulb-on), 0 0 25px #ffffff;
-                transform: translate(-50%, -50%) scale(1.3);
-            }
-            21%, 100% { 
-                background-color: var(--bulb-off); 
-                box-shadow: none;
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
-
-        #header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 22vh; 
-            margin-bottom: 1.5vh;
+            border: 4px solid #9a1a1a;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
             flex-shrink: 0;
-            z-index: 10;
-            position: relative;
-            overflow: visible;
+            overflow: hidden; 
+            transform-origin: center;
         }
 
-        #title-text {
-            font-size: 6.5vw; /* 放大字體 */
-            font-weight: 900;
-            color: var(--text-gold);
-            font-style: italic;
-            letter-spacing: 0.1vw;
-            margin: 0 1vw; /* 縮小與財神爺的間距 */
-            animation: title-breathe 2.5s infinite ease-in-out;
-            white-space: nowrap;
-            z-index: 20;
-            text-shadow: 4px 4px 0px #3e2723, 0 0 20px rgba(255, 204, 0, 0.4);
-        }
-
-        /* 標題旁的大財神樣式 */
-        .header-god {
-            width: 15vw; 
-            height: 22vh;
+        header {
+            height: 22%;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            justify-content: flex-end;
-            transform: scale(0) translateY(50px); 
-            opacity: 0;
-            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 30;
+            padding-top: 10px;
         }
 
-        .header-god.show {
-            transform: scale(1.1) translateY(0); /* 稍微加大跳出比例 */
-            opacity: 1;
-        }
-
-        .sign {
-            background: linear-gradient(to bottom, #ffffff, #f0f0f0);
-            border: 4px solid #3e2723;
-            color: #e60012;
-            padding: 6px 16px;
-            font-size: 2.2vw;
-            font-weight: 900;
-            border-radius: 12px;
-            margin-bottom: -15px;
-            z-index: 40;
-            box-shadow: 0 6px 0 rgba(0,0,0,0.2), 0 10px 20px rgba(0,0,0,0.3);
+        .main-title {
+            font-size: 190px;
+            letter-spacing: 12px;
             white-space: nowrap;
-            animation: sign-wiggle 2s infinite ease-in-out;
+            animation: breathe 2s infinite ease-in-out;
+            user-select: none;
+            text-shadow: none !important;
         }
 
-        @keyframes sign-wiggle {
-            0%, 100% { transform: rotate(-2deg); }
-            50% { transform: rotate(2deg); }
+        @keyframes breathe {
+            0%, 100% { color: var(--text-yellow); }
+            50% { color: #ffffff; }
         }
 
-        @keyframes title-breathe {
-            0%, 100% {
-                filter: brightness(1) drop-shadow(0 0 10px rgba(255, 204, 0, 0.4));
-                transform: scale(1);
-            }
-            50% {
-                filter: brightness(1.2) drop-shadow(0 0 25px rgba(255, 255, 255, 0.6));
-                transform: scale(1.02);
-            }
-        }
-
-        #content-area {
+        main {
+            height: 78%;
             display: flex;
-            flex: 1;
-            gap: 2.5vw;
-            min-height: 0; 
-            padding-bottom: 2vh;
-            z-index: 10;
+            padding: 0 80px 60px 80px;
+            gap: 40px;
         }
 
-        #left-panel, #right-panel {
-            flex: 1;
-            background: var(--panel-bg);
+        .number-board {
+            position: relative;
+            width: 1250px;
+            height: 100%; 
+            background: var(--inner-panel);
             border-radius: 25px;
-            border: 4px solid #600000;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
-            padding: 2vh; 
-            min-height: 0; 
-            position: relative;
+            padding: 30px 40px;
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.6);
+            border: 2px solid rgba(255,255,255,0.1);
         }
 
-        #left-panel h3 {
-            color: #fff;
+        /* 得獎號碼標題：更大、四色跑馬燈效果 */
+        .board-label {
+            font-size: 64px; /* 字體加大 */
             text-align: center;
-            font-size: 1.6vw;
-            margin-bottom: 1.5vh;
-            flex-shrink: 0;
+            margin-bottom: 25px;
+            font-weight: 900;
+            letter-spacing: 15px;
+            animation: titleMarquee 1.5s infinite;
+            text-shadow: none;
         }
 
-        #bingo-grid {
-            flex: 1;
+        @keyframes titleMarquee {
+            0%, 100% { color: #fff200; } /* 黃 */
+            25% { color: #ff3333; }      /* 紅 */
+            50% { color: #33ccff; }      /* 藍 */
+            75% { color: #33ff33; }      /* 綠 */
+        }
+
+        .grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(15, 1fr);
             grid-template-rows: repeat(5, 1fr);
-            gap: 1vh;
-            min-height: 0; 
-            justify-items: center; 
+            gap: 15px;
+            flex: 1;
             align-items: center;
+            justify-items: center;
         }
 
         .slot {
@@ -200,13 +121,65 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 85%; 
-            aspect-ratio: 1/1; 
-            border: 1px solid rgba(255,255,255,0.1);
-            overflow: hidden;
+            position: relative;
+            width: 100%;
+            max-width: 65px;
+            aspect-ratio: 1 / 1;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
         }
 
-        .gold-ball {
+        .ball-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ball {
+            width: 92%;
+            height: 92%;
+            background: var(--gold-sphere);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #111;
+            font-weight: 900;
+            font-size: 30px;
+            opacity: 0;
+            transform: scale(0.4);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 2px 4px 8px rgba(0,0,0,0.4);
+        }
+
+        .ball.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .control-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .display-circle {
+            width: 440px;
+            height: 440px;
+            background: white;
+            border-radius: 50%;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+
+        .inner-display {
             width: 100%;
             height: 100%;
             background: var(--gold-sphere);
@@ -214,342 +187,273 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #3e2723;
-            font-size: 2.2vw; 
+            border: 4px solid #333;
+        }
+
+        #current-num {
+            font-size: 240px;
+            color: #111;
             font-weight: 900;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.6);
-            transform: scale(0);
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            line-height: 1;
-        }
-        .gold-ball.active { transform: scale(1); }
-
-        #right-panel {
-            justify-content: space-around; 
-            align-items: center;
-        }
-
-        #sphere-big {
-            width: 18vw;
-            height: 18vw;
-            background: var(--gold-sphere);
-            border-radius: 50%;
-            border: 8px solid #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-            flex-shrink: 0;
-            z-index: 20;
-        }
-
-        #sphere-number {
-            font-size: 9vw;
-            font-weight: 900;
-            color: #3e2723;
         }
 
         #draw-btn {
-            width: 85%;
-            padding: 1.5vh 0;
-            background: linear-gradient(180deg, #ffeb3b 0%, #fbc02d 45%, #e65100 100%);
-            border: 4px solid #3e2723;
-            border-radius: 50px;
-            color: #3e2723;
-            font-size: 2.8vw;
+            width: 400px;
+            height: 120px;
+            background: var(--btn-yellow);
+            border: 6px solid #222;
+            border-radius: 80px;
+            font-size: 64px;
             font-weight: 900;
+            color: #111;
             cursor: pointer;
-            box-shadow: 0 6px 0 #2a1b0a;
+            box-shadow: 0 12px 0 #6d0b0e;
             transition: all 0.1s;
-            flex-shrink: 0;
-            user-select: none;
-            z-index: 20;
         }
 
         #draw-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #2a1b0a;
+            transform: translateY(8px);
+            box-shadow: 0 4px 0 #6d0b0e;
         }
 
-        #rem-status {
-            color: #ffcc00;
-            font-size: 1.4vw;
-        }
-
-        #reset-btn {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(255,255,255,0.15);
-            color: rgba(255,255,255,0.7);
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 4px 12px;
-            border-radius: 5px;
-            font-size: 0.8vw;
-            cursor: pointer;
-            z-index: 60;
-        }
-
-        #modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 200;
-        }
-        #modal-box {
-            background: #fff;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-        }
-        .modal-btn {
-            padding: 10px 20px;
-            margin: 10px;
-            border-radius: 5px;
-            cursor: pointer;
+        .stats {
+            color: var(--text-yellow);
+            font-size: 36px;
             font-weight: bold;
         }
 
-        .god-svg { width: 100%; height: 100%; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4)); }
+        .lights-container {
+            position: absolute;
+            top: 25px; left: 25px; right: 25px; bottom: 25px;
+            pointer-events: none;
+            z-index: 100;
+        }
+        .bulb {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #fff;
+            animation: blinkBulb 0.8s infinite alternate;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes blinkBulb { 
+            from { opacity: 0.3; transform: translate(-50%, -50%) scale(0.8); } 
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } 
+        }
+
+        #reset {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            color: rgba(255,255,255,0.3);
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 110;
+        }
     </style>
 </head>
 <body>
 
-    <div id="modal-overlay">
-        <div id="modal-box">
-            <h2 class="text-2xl font-bold mb-4 text-gray-800">確定要重新開始嗎？</h2>
-            <p class="mb-6 text-gray-600">這會清空目前所有的開獎號碼。</p>
-            <button onclick="resetGame()" class="modal-btn bg-red-600 text-white hover:bg-red-700">確定重新開局</button>
-            <button onclick="closeModal()" class="modal-btn bg-gray-200 hover:bg-gray-300">取消</button>
-        </div>
-    </div>
+    <div id="canvas">
+        <div id="lights" class="lights-container"></div>
+        <div id="reset" onclick="resetGame()">重設 (R)</div>
 
-    <div id="main-stage">
-        <button id="reset-btn" onclick="openModal()">重新開局 (R)</button>
-        <div id="marquee-container"></div>
-        
-        <div id="header">
-            <!-- 左邊立體財神 -->
-            <div id="god-left" class="header-god">
-                <div class="sign">恭喜</div>
-                <svg viewBox="0 0 200 220" class="god-svg">
-                    <defs>
-                        <radialGradient id="faceGrad" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" style="stop-color:#ffe0bd;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#f5c99e;stop-opacity:1" />
-                        </radialGradient>
-                        <linearGradient id="clothGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" style="stop-color:#ff1a1a;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#990000;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    <path d="M20 70 Q0 70 0 50 Q0 30 20 30 L50 45 L50 75 Z" fill="#3e2723" />
-                    <path d="M180 70 Q200 70 200 50 Q200 30 180 30 L150 45 L150 75 Z" fill="#3e2723" />
-                    <path d="M60 70 Q100 20 140 70 L145 90 Q100 75 55 90 Z" fill="#e60012" stroke="#3e2723" stroke-width="2"/>
-                    <rect x="85" y="45" width="30" height="15" rx="5" fill="#ffcc00" stroke="#3e2723" stroke-width="1"/>
-                    <circle cx="100" cy="120" r="55" fill="url(#faceGrad)" stroke="#3e2723" stroke-width="2"/>
-                    <circle cx="70" cy="135" r="10" fill="#ff9999" opacity="0.4"/>
-                    <circle cx="130" cy="135" r="10" fill="#ff9999" opacity="0.4"/>
-                    <path d="M75 115 Q85 110 90 115" fill="none" stroke="#3e2723" stroke-width="4" stroke-linecap="round"/>
-                    <path d="M110 115 Q115 110 125 115" fill="none" stroke="#3e2723" stroke-width="4" stroke-linecap="round"/>
-                    <path d="M80 145 Q100 165 120 145" fill="none" stroke="#e60012" stroke-width="4" stroke-linecap="round"/>
-                    <path d="M50 170 Q100 155 150 170 L165 220 L35 220 Z" fill="url(#clothGrad)" stroke="#3e2723" stroke-width="2"/>
-                    <path d="M80 185 Q100 170 120 185 Q120 205 80 205 Z" fill="#ffcc00" stroke="#b8860b" stroke-width="1"/>
-                    <circle cx="100" cy="188" r="8" fill="#ffdb4d" />
-                </svg>
-            </div>
+        <header>
+            <h1 class="main-title">富住通賓果大樂透</h1>
+        </header>
 
-            <h1 id="title-text">富住通賓果大樂透</h1>
+        <main>
+            <section class="number-board">
+                <div class="board-label">得獎號碼</div>
+                <div id="bingo-grid" class="grid"></div>
+            </section>
 
-            <!-- 右邊立體財神 -->
-            <div id="god-right" class="header-god">
-                <div class="sign">中獎</div>
-                <svg viewBox="0 0 200 220" class="god-svg">
-                    <path d="M20 70 Q0 70 0 50 Q0 30 20 30 L50 45 L50 75 Z" fill="#3e2723" />
-                    <path d="M180 70 Q200 70 200 50 Q200 30 180 30 L150 45 L150 75 Z" fill="#3e2723" />
-                    <path d="M60 70 Q100 20 140 70 L145 90 Q100 75 55 90 Z" fill="#e60012" stroke="#3e2723" stroke-width="2"/>
-                    <rect x="85" y="45" width="30" height="15" rx="5" fill="#ffcc00" stroke="#3e2723" stroke-width="1"/>
-                    <circle cx="100" cy="120" r="55" fill="url(#faceGrad)" stroke="#3e2723" stroke-width="2"/>
-                    <circle cx="70" cy="135" r="10" fill="#ff9999" opacity="0.4"/>
-                    <circle cx="130" cy="135" r="10" fill="#ff9999" opacity="0.4"/>
-                    <path d="M75 115 Q85 110 90 115" fill="none" stroke="#3e2723" stroke-width="4" stroke-linecap="round"/>
-                    <path d="M110 115 Q115 110 125 115" fill="none" stroke="#3e2723" stroke-width="4" stroke-linecap="round"/>
-                    <path d="M80 145 Q100 165 120 145" fill="none" stroke="#e60012" stroke-width="4" stroke-linecap="round"/>
-                    <path d="M50 170 Q100 155 150 170 L165 220 L35 220 Z" fill="url(#clothGrad)" stroke="#3e2723" stroke-width="2"/>
-                    <path d="M80 185 Q100 170 120 185 Q120 205 80 205 Z" fill="#ffcc00" stroke="#b8860b" stroke-width="1"/>
-                    <circle cx="100" cy="188" r="8" fill="#ffdb4d" />
-                </svg>
-            </div>
-        </div>
-
-        <div id="content-area">
-            <div id="left-panel">
-                <h3>得獎號碼</h3>
-                <div id="bingo-grid"></div>
-            </div>
-            <div id="right-panel">
-                <div id="sphere-big">
-                    <div id="sphere-number">?</div>
+            <section class="control-panel">
+                <div class="display-circle">
+                    <div class="inner-display">
+                        <div id="current-num">?</div>
+                    </div>
                 </div>
-                <button id="draw-btn">賓果按鈕</button>
-                <div id="rem-status">剩餘號碼：<span id="rem-count">75</span> / 75</div>
-            </div>
-        </div>
+
+                <button id="draw-btn">按鈕</button>
+
+                <div class="stats">
+                    剩餘號碼：<span id="rem">75</span> / 75
+                </div>
+            </section>
+        </main>
     </div>
 
     <script>
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        // 音效系統
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx = null;
 
         function playSound(type) {
-            if (!audioCtx) audioCtx = new AudioCtx();
+            if (!audioCtx) audioCtx = new AudioContext();
+            
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
 
-            if (type === 'spin') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(440, now);
-                osc.frequency.exponentialRampToValueAtTime(880, now + 0.05);
-                gain.gain.setValueAtTime(0.05, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-                osc.start(now); osc.stop(now + 0.05);
-            } else if (type === 'win') {
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'spin') {
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(523.25, now);
-                osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.3);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-                osc.start(now); osc.stop(now + 0.5);
-                const osc2 = audioCtx.createOscillator();
-                osc2.connect(gain); osc2.frequency.setValueAtTime(659.25, now);
-                osc2.start(now); osc2.stop(now + 0.5);
+                osc.frequency.setValueAtTime(200 + Math.random() * 300, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            } else if (type === 'win') {
+                const now = audioCtx.currentTime;
+                const freqs = [523.25, 659.25, 783.99, 1046.50];
+                freqs.forEach((f, i) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.type = 'square';
+                    o.frequency.setValueAtTime(f, now + (i * 0.1));
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    g.gain.setValueAtTime(0.1, now + (i * 0.1));
+                    g.gain.exponentialRampToValueAtTime(0.01, now + (i * 0.1) + 0.3);
+                    o.start(now + (i * 0.1));
+                    o.stop(now + (i * 0.1) + 0.3);
+                });
             }
         }
 
-        function initMarquee() {
-            const container = document.getElementById('marquee-container');
-            container.innerHTML = ''; 
-            const rect = container.getBoundingClientRect();
-            if (rect.width === 0) { setTimeout(initMarquee, 100); return; }
-            const width = rect.width; const height = rect.height;
-            const targetSpacing = 35;
-            const hCount = Math.round(width / targetSpacing);
-            const vCount = Math.round(height / targetSpacing);
-            const hGap = width / hCount; const vGap = height / vCount;
-            let points = [];
-            for (let i = 0; i < hCount; i++) points.push({x: i * hGap, y: 0});
-            for (let i = 0; i < vCount; i++) points.push({x: width, y: i * vGap});
-            for (let i = hCount; i > 0; i--) points.push({x: i * hGap, y: height});
-            for (let i = vCount; i > 0; i--) points.push({x: 0, y: i * vGap});
-            const total = points.length; const cycleDuration = 2.0; 
-            points.forEach((p, i) => {
-                const b = document.createElement('div');
-                b.className = 'bulb'; b.style.left = p.x + 'px'; b.style.top = p.y + 'px';
-                b.style.animation = `marquee-flash ${cycleDuration}s linear infinite`;
-                b.style.animationDelay = `${(i / total) * cycleDuration}s`;
-                container.appendChild(b);
-            });
+        function handleResize() {
+            const canvas = document.getElementById('canvas');
+            const winW = window.innerWidth;
+            const winH = window.innerHeight;
+            const scale = Math.min(winW / 1920, winH / 1080);
+            canvas.style.transform = `scale(${scale})`;
         }
-        window.addEventListener('resize', initMarquee);
-        window.onload = initMarquee;
+        window.addEventListener('resize', handleResize);
 
-        const MAX_POOL = 75; 
-        let drawPool = Array.from({length: MAX_POOL}, (_, i) => i + 1);
-        let drawnResults = [];
-        let isProcessing = false;
+        function initLights() {
+            const container = document.getElementById('lights');
+            container.innerHTML = '';
+            const w = 1870; 
+            const h = 1030; 
+            const step = 45; 
+            for(let x=0; x <= w; x += step) addBulb(x, 0, x/w);
+            for(let x=0; x <= w; x += step) addBulb(x, h, 1 - x/w);
+            for(let y=step; y < h; y += step) addBulb(0, y, 1 - y/h);
+            for(let y=step; y < h; y += step) addBulb(w, y, y/h);
+        }
 
-        const grid = document.getElementById('bingo-grid');
-        const sphereNumDisplay = document.getElementById('sphere-number');
-        const remDisplay = document.getElementById('rem-count');
-        const godLeft = document.getElementById('god-left');
-        const godRight = document.getElementById('god-right');
+        function addBulb(x, y, delay) {
+            const b = document.createElement('div');
+            b.className = 'bulb';
+            b.style.left = x + 'px';
+            b.style.top = y + 'px';
+            b.style.animationDelay = (delay * 1.5) + 's';
+            document.getElementById('lights').appendChild(b);
+        }
 
-        function createGrid() {
+        const MAX = 75;
+        let pool = Array.from({length: MAX}, (_, i) => i + 1);
+        let drawnHistory = [];
+        let isSpinning = false;
+
+        function buildGrid() {
+            const grid = document.getElementById('bingo-grid');
             grid.innerHTML = '';
-            for(let i=0; i<25; i++) {
+            for(let i=0; i<MAX; i++) {
                 const slot = document.createElement('div');
-                slot.className = 'slot'; slot.id = `slot-${i}`;
+                slot.className = 'slot';
+                const container = document.createElement('div');
+                container.className = 'ball-container';
+                const ball = document.createElement('div');
+                ball.className = 'ball';
+                ball.id = `slot-${i}`;
+                container.appendChild(ball);
+                slot.appendChild(container);
                 grid.appendChild(slot);
             }
         }
-        createGrid();
 
-        function startDraw() {
-            if (isProcessing || drawnResults.length >= 25 || drawPool.length === 0) return;
-            isProcessing = true;
-            godLeft.classList.remove('show');
-            godRight.classList.remove('show');
-            
+        function draw() {
+            if(isSpinning || pool.length === 0) return;
+            isSpinning = true;
+            playSound('click');
+            const btn = document.getElementById('draw-btn');
+            const display = document.getElementById('current-num');
+            btn.disabled = true;
             let count = 0;
-            const spin = setInterval(() => {
-                sphereNumDisplay.innerText = Math.floor(Math.random() * MAX_POOL) + 1;
+            const roll = setInterval(() => {
+                display.innerText = Math.floor(Math.random() * MAX) + 1;
                 playSound('spin');
                 count++;
-                if (count > 20) { clearInterval(spin); executeResult(); }
+                if(count > 25) {
+                    clearInterval(roll);
+                    finishDraw();
+                }
             }, 60);
         }
 
-        function executeResult() {
-            const idx = Math.floor(Math.random() * drawPool.length);
-            const num = drawPool.splice(idx, 1)[0];
-            sphereNumDisplay.innerText = num;
-            drawnResults.push(num);
-            remDisplay.innerText = drawPool.length;
-            
-            const slot = document.getElementById(`slot-${drawnResults.length - 1}`);
-            const ball = document.createElement('div');
-            ball.className = 'gold-ball'; ball.innerText = num;
-            slot.appendChild(ball);
-            
-            setTimeout(() => {
-                ball.classList.add('active');
-                playSound('win');
-                godLeft.classList.add('show');
-                godRight.classList.add('show');
-                
-                confetti({ 
-                    particleCount: 150, spread: 80, origin: { y: 0.6 }, 
-                    colors: ['#ffcc00', '#ffffff', '#e60012'] 
-                });
-                
-                setTimeout(() => {
-                    godLeft.classList.remove('show');
-                    godRight.classList.remove('show');
-                    isProcessing = false;
-                }, 3500);
-            }, 50);
+        function finishDraw() {
+            const display = document.getElementById('current-num');
+            const btn = document.getElementById('draw-btn');
+            const idx = Math.floor(Math.random() * pool.length);
+            const num = pool.splice(idx, 1)[0];
+            display.innerText = num;
+            playSound('win');
+            drawnHistory.push(num);
+            const pos = drawnHistory.length - 1; 
+            const targetBall = document.getElementById(`slot-${pos}`);
+            if(targetBall) {
+                targetBall.innerText = num;
+                targetBall.classList.add('active');
+            }
+            document.getElementById('rem').innerText = pool.length;
+            const count = 200;
+            const defaults = { origin: { y: 0.7 } };
+            function fire(particleRatio, opts) {
+                confetti({...defaults, ...opts, particleCount: Math.floor(count * particleRatio)});
+            }
+            fire(0.25, { spread: 26, startVelocity: 55 });
+            fire(0.2, { spread: 60 });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
+            isSpinning = false;
+            btn.disabled = false;
         }
 
-        function openModal() { document.getElementById('modal-overlay').style.display = 'flex'; }
-        function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
         function resetGame() {
-            drawPool = Array.from({length: MAX_POOL}, (_, i) => i + 1);
-            drawnResults = []; isProcessing = false;
-            sphereNumDisplay.innerText = '?';
-            remDisplay.innerText = MAX_POOL;
-            godLeft.classList.remove('show'); godRight.classList.remove('show');
-            createGrid(); closeModal();
+            if(!confirm("確定要重設並清空所有得獎號碼嗎？")) return;
+            pool = Array.from({length: MAX}, (_, i) => i + 1);
+            drawnHistory = [];
+            document.getElementById('current-num').innerText = "?";
+            document.getElementById('rem').innerText = MAX;
+            document.querySelectorAll('.ball').forEach(b => {
+                b.classList.remove('active');
+                b.innerText = "";
+            });
         }
 
-        document.getElementById('draw-btn').addEventListener('click', startDraw);
-        window.addEventListener('keydown', (e) => {
-            if (e.key.toLowerCase() === 'r') { openModal(); return; }
-            if (document.getElementById('modal-overlay').style.display === 'flex') return;
-            startDraw();
-            if (e.key === " ") e.preventDefault();
-        });
+        window.onload = () => {
+            initLights();
+            buildGrid();
+            handleResize();
+        };
 
-        document.body.addEventListener('click', () => {
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-        }, { once: true });
+        document.getElementById('draw-btn').onclick = draw;
+        window.onkeydown = (e) => {
+            if(e.code === 'Space' || e.code === 'Enter') draw();
+            if(e.key.toLowerCase() === 'r') resetGame();
+        };
     </script>
 </body>
 </html>
