@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>富住通賓果大樂透 - 最終優化版</title>
+    <title>富住通賓果大樂透 - 歡樂音效版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -14,8 +14,8 @@
             --panel-bg: #8b0000;
             --gold-sphere: radial-gradient(circle at 35% 35%, #fff9c4 0%, #ffeb3b 30%, #fbc02d 60%, #e65100 100%);
             --text-gold: #ffcc00; 
-            --bulb-on: #fff000; /* 明亮黃燈 */
-            --bulb-off: #5a0000; /* 熄滅時的深紅色暗影 */
+            --bulb-on: #fff000;
+            --bulb-off: #5a0000;
         }
 
         body {
@@ -35,7 +35,6 @@
             width: 96vw;
             height: 92vh;
             background-color: var(--primary-red);
-            /* 紅色外框厚度 20px */
             border: 20px solid #c00000;
             outline: 6px solid #ffcc00;
             border-radius: 15px;
@@ -46,7 +45,6 @@
             box-shadow: 0 0 60px rgba(0,0,0,1);
         }
 
-        /* 跑馬燈容器：精確定位於 20px 邊框的中心線 (即 -10px 位置) */
         #marquee-container {
             position: absolute;
             top: -10px;
@@ -67,7 +65,6 @@
             border: 1px solid rgba(0,0,0,0.3);
         }
 
-        /* 經典跑馬燈閃爍動畫：呈現黃燈點亮感 */
         @keyframes marquee-flash {
             0%, 20% { 
                 background-color: var(--bulb-on); 
@@ -132,6 +129,7 @@
             flex-direction: column;
             padding: 2vh; 
             min-height: 0; 
+            position: relative;
         }
 
         #left-panel h3 {
@@ -222,6 +220,7 @@
             box-shadow: 0 6px 0 #2a1b0a;
             transition: all 0.1s;
             flex-shrink: 0;
+            user-select: none;
         }
 
         #draw-btn:active {
@@ -234,11 +233,67 @@
             font-size: 1.4vw;
             flex-shrink: 0;
         }
+
+        #reset-btn {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 5px;
+            font-size: 0.8vw;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 60;
+        }
+        #reset-btn:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+        #modal-box {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .modal-btn {
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
+    <div id="modal-overlay">
+        <div id="modal-box">
+            <h2 class="text-2xl font-bold mb-4">確定要重新開始嗎？</h2>
+            <p class="mb-6">這會清空目前所有的開獎號碼。</p>
+            <button onclick="resetGame()" class="modal-btn bg-red-600 text-white">確定重新開局</button>
+            <button onclick="closeModal()" class="modal-btn bg-gray-200">取消</button>
+        </div>
+    </div>
+
     <div id="main-stage">
+        <button id="reset-btn" onclick="openModal()">重新開局 (R)</button>
         <div id="marquee-container"></div>
         <div id="header">
             <h1 id="title-text">富住通賓果大樂透</h1>
@@ -259,6 +314,52 @@
     </div>
 
     <script>
+        // 音效系統
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function playSound(type) {
+            if (!audioCtx) audioCtx = new AudioCtx();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'spin') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.05);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } else if (type === 'win') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.3); // C6
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+                // 額外的和弦效果
+                const osc2 = audioCtx.createOscillator();
+                osc2.connect(gain);
+                osc2.frequency.setValueAtTime(659.25, now); // E5
+                osc2.start(now);
+                osc2.stop(now + 0.5);
+            } else if (type === 'reset') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, now);
+                osc.frequency.exponentialRampToValueAtTime(440, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            }
+        }
+
         function initMarquee() {
             const container = document.getElementById('marquee-container');
             container.innerHTML = ''; 
@@ -267,8 +368,6 @@
 
             const width = rect.width;
             const height = rect.height;
-            
-            // 平均間距計算
             const targetSpacing = 35; 
             const hCount = Math.round(width / targetSpacing);
             const vCount = Math.round(height / targetSpacing);
@@ -307,12 +406,16 @@
         const sphereNumDisplay = document.getElementById('sphere-number');
         const remDisplay = document.getElementById('rem-count');
 
-        for(let i=0; i<25; i++) {
-            const slot = document.createElement('div');
-            slot.className = 'slot';
-            slot.id = `slot-${i}`;
-            grid.appendChild(slot);
+        function createGrid() {
+            grid.innerHTML = '';
+            for(let i=0; i<25; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'slot';
+                slot.id = `slot-${i}`;
+                grid.appendChild(slot);
+            }
         }
+        createGrid();
 
         function startDraw() {
             if (isProcessing || drawnResults.length >= 25 || drawPool.length === 0) return;
@@ -320,6 +423,7 @@
             let count = 0;
             const spin = setInterval(() => {
                 sphereNumDisplay.innerText = Math.floor(Math.random() * MAX_POOL) + 1;
+                playSound('spin'); // 滾動聲
                 count++;
                 if (count > 15) { clearInterval(spin); executeResult(); }
             }, 60);
@@ -331,19 +435,59 @@
             sphereNumDisplay.innerText = num;
             drawnResults.push(num);
             remDisplay.innerText = drawPool.length;
+            
             const slot = document.getElementById(`slot-${drawnResults.length - 1}`);
             const ball = document.createElement('div');
             ball.className = 'gold-ball';
             ball.innerText = num;
             slot.appendChild(ball);
+            
             setTimeout(() => {
                 ball.classList.add('active');
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#ffcc00', '#ffffff', '#e60012'] });
+                playSound('win'); // 獲勝開獎聲
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#ffcc00', '#ffffff', '#e60012'] });
                 isProcessing = false;
             }, 50);
         }
 
+        function openModal() {
+            document.getElementById('modal-overlay').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').style.display = 'none';
+        }
+
+        function resetGame() {
+            playSound('reset'); // 重置聲
+            drawPool = Array.from({length: MAX_POOL}, (_, i) => i + 1);
+            drawnResults = [];
+            isProcessing = false;
+            sphereNumDisplay.innerText = '?';
+            remDisplay.innerText = MAX_POOL;
+            createGrid();
+            closeModal();
+            confetti({ particleCount: 50, spread: 50, origin: { y: 0.9 } });
+        }
+
         document.getElementById('draw-btn').addEventListener('click', startDraw);
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'r') {
+                openModal();
+                return;
+            }
+            if (document.getElementById('modal-overlay').style.display === 'flex') return;
+            startDraw();
+            if (e.key === " ") e.preventDefault();
+        });
+
+        // 啟動音效環境
+        document.body.addEventListener('click', () => {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }, { once: true });
     </script>
 </body>
 </html>
